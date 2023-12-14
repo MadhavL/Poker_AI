@@ -55,6 +55,17 @@ class PokerGame:
         # then if in any category, both players have the same (non-zero) pair, straight, etc. then it must be a tie 
         # (there is no "kicker")
 
+        #Check straight flush
+        p0_straight = poker_utils.straight_exists(self._hands[0], self._community_cards)
+        p1_straight = poker_utils.straight_exists(self._hands[1], self._community_cards)
+
+        p0_flush = poker_utils.flush_exists(self._hands[0], self._community_cards)
+        p1_flush = poker_utils.flush_exists(self._hands[1], self._community_cards)
+
+        #REWRITE STRAIGHT FLUSH RULES
+
+        #Check pair
+
         p0_pair = poker_utils.pair_exists(self._hands[0], self._community_cards)
         p1_pair = poker_utils.pair_exists(self._hands[1], self._community_cards)
         print(f"P0 pair: {p0_pair}")
@@ -68,8 +79,7 @@ class PokerGame:
         elif p0_pair == p1_pair != 0:
             return 0, 0 #Tie!
         
-        p0_straight = poker_utils.straight_exists(self._hands[0], self._community_cards)
-        p1_straight = poker_utils.straight_exists(self._hands[1], self._community_cards)
+        #Check straight
         print(f"P0 straight: {p0_straight}")
         print(f"P1 straight: {p1_straight}")
 
@@ -80,7 +90,24 @@ class PokerGame:
             return -1, 0
         elif p0_straight == p1_straight != 0:
             return 0, 0 #Tie!
-
+        
+        #Check flush
+        print(f"P0 flush: {p0_flush}")
+        print(f"P1 flush: {p1_flush}")
+        if p0_flush and not p1_flush:
+            return 1, 0 #For now, the chips is not being calculated
+        elif p1_flush and not p0_flush:
+            return -1, 0
+        elif p0_flush and p1_flush:
+            return 1 if p0_flush == max(p0_flush, p1_flush) else -1, 0
+        
+        #No pair, straight, or flush. Compare cards
+        if self._hands[0].rank() > self._hands[1].rank():
+            return 1, 0
+        elif self._hands[1].rank() > self._hands[0].rank():
+            return -1, 0
+        
+        # Tie
         return 0, 0
 
 
@@ -102,8 +129,7 @@ class PokerGame:
         # Print out results
         print(f"P0 Hand: {self._hands[0]}")
         print(f"P1 Hand: {self._hands[1]}")
-        print(f"Community Cards: {self._community_cards}")
-        print(f"Remaining in Deck: {self._deck.size()}")
+        print(f"Community Cards: {self._community_cards}\n")
 
         policies = [p0_policy, p1_policy]
         p = 0 #Always start from player 1
@@ -114,14 +140,14 @@ class PokerGame:
             self._history.append(action)
             p = int(not p) # Next player
 
-        print(f"Betting ended. History: {self._history}")
+        print(f"Betting ended. History: {self._history}\n")
         
         winner, margin = self.determine_game_result()
         if winner == 1:
-            print(f"P0 won\n")
+            print(f"P0 won\n\n")
 
         elif winner == -1:
-            print(f"P1 won\n")
+            print(f"P1 won\n\n")
 
         else:
             print("Tie\n")

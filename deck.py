@@ -36,21 +36,18 @@ class Card:
     def __hash__(self):
         return self._hash
 
-
+# Standard 52 card deck
 class Deck:
     #Creates a list of Card objects (for each card in a deck)
-    def __init__(self, ranks, suits, copies):
-        """ Creates a deck of cards including the given number of copies
+    def __init__(self):
+        """ Creates a standard deck of 52 cards including the given number of copies
             of each possible combination of the given ranks and the
             given suits.
-
-            ranks -- an iterable of integers
-            suits -- an iterable
-            copies -- a nonnegative integer
         """
         self._cards = []
-        for copy in range(copies):
-            self._cards.extend(map(lambda c: Card(*c), it.product(ranks, suits))) #Create a cartesian product of rank & suit (becomes a tuple), pass each one of those into the map that unpacks the tuple and creates a card out of it
+        self._ranks = range(1, 14) #Ace to King
+        self._suits = ['S', 'H', 'D', 'C'] #Spades, Hearts, Diamonds, Clubs
+        self._cards.extend(map(lambda c: Card(*c), it.product(self._ranks, self._suits))) #Create a cartesian product of rank & suit (becomes a tuple), pass each one of those into the map that unpacks the tuple and creates a card out of it
 
     #Shuffle the list of cards      
     def shuffle(self):
@@ -72,8 +69,8 @@ class Deck:
         del self._cards[-n:] #Remove those cards from the deck
         return dealt
 
-
-    def peek(self, n):
+    # Hidden function: don't want the client to be able to access this (only for debugging purposes)
+    def _peek(self, n):
         """ Returns the next n cards from this deck without removing them.
 
             n -- an integer between 0 and the size of this deck (inclusive)
@@ -108,3 +105,8 @@ class Deck:
             else:
                 remaining.append(card)
         self._cards = remaining
+
+    # Reset the deck back to original state
+    def reset(self):
+        self._cards = []
+        self._cards.extend(map(lambda c: Card(*c), it.product(self._ranks, self._suits))) #Create a cartesian product of rank & suit (becomes a tuple), pass each one of those into the map that unpacks the tuple and creates a card out of it

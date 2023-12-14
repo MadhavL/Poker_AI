@@ -1,4 +1,5 @@
 from deck import Deck, Card
+import poker_utils
 
 # Keep track of our game according to our rules
 class PokerGame:
@@ -7,7 +8,7 @@ class PokerGame:
         self._deck = Deck()
         self._actions = [0, 1] #0 is fold or pass, 1 is check or bet
         self._num_community_cards = 3
-        self._num_player_cards = 2
+        self._num_player_cards = 1
         self._hands = [[], []] #hands[0] is player 1's hand, hands[1] is player 2's hand. Each hand is a list of Card objects
         self._community_cards = [] # List of Card objects that are the community cards
         self._history = [] #List of actions each player takes (0 or 1), always starts from P0's action.
@@ -42,9 +43,49 @@ class PokerGame:
             player: which player to return the state for
         """
         return (self._hands[player], self._community_cards, self._history)
+    
+    def determine_game_result(self):
+        """ Determine the result of a game in terminal state. 
+        Returns:
+            the winner: 1 for p0, -1 for p1
+            the amount of chips won: +ve for p0 win, -ve for p1 win
+        """
+        assert(self.betting_ended())
+        # Note, since a complete hand is only 2 cards in total, and since in Poker only the highest hand plays,
+        # then if in any category, both players have the same (non-zero) pair, straight, etc. then it must be a tie 
+        # (there is no "kicker")
+
+        p0_pair = poker_utils.pair_exists(self._hands[0], self._community_cards)
+        p1_pair = poker_utils.pair_exists(self._hands[1], self._community_cards)
+        print(f"P0 pair: {p0_pair}")
+        print(f"P1 pair: {p1_pair}")
+
+        # If anyone has a higher pair, that person wins.
+        if p0_pair > p1_pair:
+            return 1, 0 #For now, the chips is not being calculated
+        elif p1_pair > p0_pair:
+            return -1, 0
+        elif p0_pair == p1_pair != 0:
+            return 0, 0 #Tie!
+        
+        p0_straight = poker_utils.straight_exists(self._hands[0], self._community_cards)
+        p1_straight = poker_utils.straight_exists(self._hands[1], self._community_cards)
+        print(f"P0 straight: {p0_straight}")
+        print(f"P1 straight: {p1_straight}")
+
+        # If anyone has a higher straight, that person wins.
+        if p0_straight > p1_straight:
+            return 1, 0 #For now, the chips is not being calculated
+        elif p1_straight > p0_straight:
+            return -1, 0
+        elif p0_straight == p1_straight != 0:
+            return 0, 0 #Tie!
+
+        return 0, 0
+
 
     def play(self, p0_policy, p1_policy):
-        """ Play 1 game of simplified poker, return the result of the game
+        """ Play 1 game of simplified poker, return the result of the game and the margin of victory
 
             p0_policy -- player 0's policy: has a function take_action() that takes in a state and returns action
             p1_policy -- player 1's policy
@@ -59,8 +100,8 @@ class PokerGame:
         self.deal_cards()
 
         # Print out results
-        print(f"P1 Hand: {self._hands[0]}")
-        print(f"P2 Hand: {self._hands[1]}")
+        print(f"P0 Hand: {self._hands[0]}")
+        print(f"P1 Hand: {self._hands[1]}")
         print(f"Community Cards: {self._community_cards}")
         print(f"Remaining in Deck: {self._deck.size()}")
 
@@ -73,4 +114,14 @@ class PokerGame:
             self._history.append(action)
             p = int(not p) # Next player
 
-        print(f"Betting ended. History: {self._history}\n")
+        print(f"Betting ended. History: {self._history}")
+        
+        winner, margin = self.determine_game_result()
+        if winner == 1:
+            print(f"P0 won\n")
+
+        elif winner == -1:
+            print(f"P1 won\n")
+
+        else:
+            print("Tie\n")

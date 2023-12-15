@@ -54,15 +54,11 @@ class PokerGame:
 
         # First check cases where hands don't need to be evaluated:
         #Player 0 checks, 1 bets, 0 folds. P1 wins 1
-        if self._history == [0, 1, 0]:
-            return -1, -1
+        if self._history in [[0, 1, 0], [1, 0], [0, 0]]:
+            return 0, 0
         
-        #Player 0 bets, 1 folds. P0 wins 1
-        elif self._history == [1, 0]:
-            return 1, 1
-        
-        #Otherwise, evaluate the better hand
-        reward = 1 if self._history == [0, 0] else 2
+        #Otherwise, evaluate the better hand (these are only for cases: [0, 1, 1] and [1, 1])
+        reward = 1 #How much is in the pot
 
         # Note, since a complete hand is only 2 cards in total, and since in Poker only the highest hand plays,
         # then if in any category, both players have the same (non-zero) pair, straight, etc. then it must be a tie 
@@ -78,7 +74,7 @@ class PokerGame:
 
         # If anyone has a higher straight flush, that person wins.
         if p0_straight_flush > p1_straight_flush:
-            return 1, reward #For now, the chips is not being calculated
+            return 1, reward
         elif p1_straight_flush > p0_straight_flush:
             return -1, -reward
         elif p0_straight_flush == p1_straight_flush != 0:
@@ -94,7 +90,7 @@ class PokerGame:
 
         # If anyone has a higher pair, that person wins.
         if p0_pair > p1_pair:
-            return 1, reward #For now, the chips is not being calculated
+            return 1, reward
         elif p1_pair > p0_pair:
             return -1, -reward
         elif p0_pair == p1_pair != 0:
@@ -110,9 +106,9 @@ class PokerGame:
 
         # If anyone has a higher straight, that person wins.
         if p0_straight > p1_straight:
-            return 1, reward #For now, the chips is not being calculated
+            return 1, reward
         elif p1_straight > p0_straight:
-            return -1, reward
+            return -1, -reward
         elif p0_straight == p1_straight != 0:
             return 0, 0 #Tie!
         
@@ -124,7 +120,7 @@ class PokerGame:
             print(f"P0 flush: {p0_flush}")
             print(f"P1 flush: {p1_flush}")
         if p0_flush and not p1_flush:
-            return 1, reward #For now, the chips is not being calculated
+            return 1, reward
         elif p1_flush and not p0_flush:
             return -1, -reward
         elif p0_flush and p1_flush:

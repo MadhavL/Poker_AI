@@ -2,11 +2,12 @@ import poker_utils
 from deck import Deck
 
 class ExpectimaxAgent():
-    def __init__(self, verbose=False):
+    def __init__(self, bet_threshold=0.3, verbose=False):
         self._remaining_deck = Deck()
         #Define functions that check each of the hand types
         self._possible_hands = [lambda x, _: x[0].rank(), poker_utils.flush_exists, poker_utils.straight_exists, poker_utils.pair_exists, poker_utils.straight_flush_exists]
         self._verbose = verbose
+        self._bet_threshold = bet_threshold
     
     #Return the action taken from the state of the game
     def take_action(self, state):
@@ -56,6 +57,10 @@ class ExpectimaxAgent():
         
         if self._verbose:
             print(f"Your hand loses to {lose_count}/{self._remaining_deck.size()}")
+        
         win_prob = 1 - lose_count / self._remaining_deck.size()
-        print(f"Expected win prob: {win_prob: .2f}")
-        return 0
+        if self._verbose:
+            print(f"Expected win prob: {win_prob: .2f}")
+
+        #Using heuristics for an expectimax agent. If our expected win probability is above our bet threshold, bet. Otherwise fold
+        return int(win_prob > self._bet_threshold)

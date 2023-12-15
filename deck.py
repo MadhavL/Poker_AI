@@ -69,7 +69,6 @@ class Deck:
         del self._cards[-n:] #Remove those cards from the deck
         return dealt
 
-    # Hidden function: don't want the client to be able to access this (only for debugging purposes)
     def peek(self, n):
         """ Returns the next n cards from this deck without removing them.
 

@@ -32,7 +32,6 @@ def flush_exists(hand, community):
     Given a hand (list of Cards) and the community cards (list of Cards), determine whether a flush exists. 
     If yes, return the (sorted in descending order) ranks of the best flush (top card, then second top card), if no, return None
     """
-    # Combine hand + community cards into one list
     player_suit = hand[0].suit()
     flush = None
     max_flush = 0
@@ -44,3 +43,21 @@ def flush_exists(hand, community):
     if not flush:
         return None
     return sorted(flush, reverse=True)
+
+def straight_flush_exists(hand, community):
+    """
+    Given a hand (list of Cards) and the community cards (list of Cards), determine whether a straight flush exists. 
+    If yes, return the (sorted in descending order) ranks of the best flush (top card, then second top card), if no, return None
+    """
+    # Find best straight flush for 1 player card + 1 community card
+    player_card_rank = hand[0].rank()
+    player_card_suit = hand[0].suit()
+    max_straight_flush = 0
+    for card in community:
+        if card.rank() == player_card_rank + 1 and card.suit() == player_card_suit:
+            if card.rank() > max_straight_flush:
+                max_straight_flush = card.rank()
+        elif card.rank() == player_card_rank - 1 and card.suit() == player_card_suit:
+            if player_card_rank > max_straight_flush:
+                max_straight_flush = player_card_rank
+    return max_straight_flush

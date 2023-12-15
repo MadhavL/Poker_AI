@@ -44,74 +44,106 @@ class PokerGame:
         """
         return (self._hands[player], self._community_cards, self._history)
     
-    def determine_game_result(self):
+    def determine_game_result(self, verbose):
         """ Determine the result of a game in terminal state. 
         Returns:
             the winner: 1 for p0, -1 for p1
             the amount of chips won: +ve for p0 win, -ve for p1 win
         """
         assert(self.betting_ended())
+
+        # First check cases where hands don't need to be evaluated:
+        #Player 0 checks, 1 bets, 0 folds. P1 wins 1
+        if self._history == [0, 1, 0]:
+            return -1, -1
+        
+        #Player 0 bets, 1 folds. P0 wins 1
+        elif self._history == [1, 0]:
+            return 1, 1
+        
+        #Otherwise, evaluate the better hand
+        reward = 1 if self._history == [0, 0] else 2
+
         # Note, since a complete hand is only 2 cards in total, and since in Poker only the highest hand plays,
         # then if in any category, both players have the same (non-zero) pair, straight, etc. then it must be a tie 
         # (there is no "kicker")
 
         #Check straight flush
-        p0_straight = poker_utils.straight_exists(self._hands[0], self._community_cards)
-        p1_straight = poker_utils.straight_exists(self._hands[1], self._community_cards)
+        
+        p0_straight_flush = poker_utils.straight_flush_exists(self._hands[0], self._community_cards)
+        p1_straight_flush = poker_utils.straight_flush_exists(self._hands[1], self._community_cards)
+        if verbose:
+            print(f"P0 straight flush: {p0_straight_flush}")
+            print(f"P1 straight flush: {p1_straight_flush}")
 
-        p0_flush = poker_utils.flush_exists(self._hands[0], self._community_cards)
-        p1_flush = poker_utils.flush_exists(self._hands[1], self._community_cards)
-
-        #REWRITE STRAIGHT FLUSH RULES
-
+        # If anyone has a higher straight flush, that person wins.
+        if p0_straight_flush > p1_straight_flush:
+            return 1, reward #For now, the chips is not being calculated
+        elif p1_straight_flush > p0_straight_flush:
+            return -1, -reward
+        elif p0_straight_flush == p1_straight_flush != 0:
+            return 0, 0 #Tie!
+        
         #Check pair
 
         p0_pair = poker_utils.pair_exists(self._hands[0], self._community_cards)
         p1_pair = poker_utils.pair_exists(self._hands[1], self._community_cards)
-        print(f"P0 pair: {p0_pair}")
-        print(f"P1 pair: {p1_pair}")
+        if verbose:
+            print(f"P0 pair: {p0_pair}")
+            print(f"P1 pair: {p1_pair}")
 
         # If anyone has a higher pair, that person wins.
         if p0_pair > p1_pair:
-            return 1, 0 #For now, the chips is not being calculated
+            return 1, reward #For now, the chips is not being calculated
         elif p1_pair > p0_pair:
-            return -1, 0
+            return -1, -reward
         elif p0_pair == p1_pair != 0:
             return 0, 0 #Tie!
         
         #Check straight
-        print(f"P0 straight: {p0_straight}")
-        print(f"P1 straight: {p1_straight}")
+
+        p0_straight = poker_utils.straight_exists(self._hands[0], self._community_cards)
+        p1_straight = poker_utils.straight_exists(self._hands[1], self._community_cards)
+        if verbose:
+            print(f"P0 straight: {p0_straight}")
+            print(f"P1 straight: {p1_straight}")
 
         # If anyone has a higher straight, that person wins.
         if p0_straight > p1_straight:
-            return 1, 0 #For now, the chips is not being calculated
+            return 1, reward #For now, the chips is not being calculated
         elif p1_straight > p0_straight:
-            return -1, 0
+            return -1, reward
         elif p0_straight == p1_straight != 0:
             return 0, 0 #Tie!
         
         #Check flush
-        print(f"P0 flush: {p0_flush}")
-        print(f"P1 flush: {p1_flush}")
+
+        p0_flush = poker_utils.flush_exists(self._hands[0], self._community_cards)
+        p1_flush = poker_utils.flush_exists(self._hands[1], self._community_cards)
+        if verbose:
+            print(f"P0 flush: {p0_flush}")
+            print(f"P1 flush: {p1_flush}")
         if p0_flush and not p1_flush:
-            return 1, 0 #For now, the chips is not being calculated
+            return 1, reward #For now, the chips is not being calculated
         elif p1_flush and not p0_flush:
-            return -1, 0
+            return -1, -reward
         elif p0_flush and p1_flush:
             return 1 if p0_flush == max(p0_flush, p1_flush) else -1, 0
         
         #No pair, straight, or flush. Compare cards
-        if self._hands[0].rank() > self._hands[1].rank():
-            return 1, 0
-        elif self._hands[1].rank() > self._hands[0].rank():
-            return -1, 0
+        if verbose:
+            print(f"P0 high card: {self._hands[0][0].rank()}")
+            print(f"P1 high card: {self._hands[1][0].rank()}")
+        if self._hands[0][0].rank() > self._hands[1][0].rank():
+            return 1, reward
+        elif self._hands[1][0].rank() > self._hands[0][0].rank():
+            return -1, -reward
         
         # Tie
         return 0, 0
 
 
-    def play(self, p0_policy, p1_policy):
+    def play(self, p0_policy, p1_policy, verbose=False):
         """ Play 1 game of simplified poker, return the result of the game and the margin of victory
 
             p0_policy -- player 0's policy: has a function take_action() that takes in a state and returns action
@@ -127,27 +159,33 @@ class PokerGame:
         self.deal_cards()
 
         # Print out results
-        print(f"P0 Hand: {self._hands[0]}")
-        print(f"P1 Hand: {self._hands[1]}")
-        print(f"Community Cards: {self._community_cards}\n")
+        if verbose:
+            print(f"P0 Hand: {self._hands[0]}")
+            print(f"P1 Hand: {self._hands[1]}")
+            print(f"Community Cards: {self._community_cards}\n")
 
         policies = [p0_policy, p1_policy]
         p = 0 #Always start from player 1
 
         while not self.betting_ended():
             action = policies[p].take_action(self.get_state(p))
-            print(f"Player {p} choses: {action}")
+            if verbose:
+                print(f"Player {p} chooses: {action}")
             self._history.append(action)
             p = int(not p) # Next player
 
-        print(f"Betting ended. History: {self._history}\n")
+        if verbose:
+            print(f"Betting ended. History: {self._history}\n")
         
-        winner, margin = self.determine_game_result()
-        if winner == 1:
-            print(f"P0 won\n\n")
+        winner, margin = self.determine_game_result(verbose=verbose)
+        if verbose:
+            if winner == 1:
+                print(f"P0 won {margin} chips\n\n")
 
-        elif winner == -1:
-            print(f"P1 won\n\n")
+            elif winner == -1:
+                print(f"P1 won {-margin} chips\n\n")
 
-        else:
-            print("Tie\n")
+            else:
+                print("Tie\n")
+        
+        return winner, margin

@@ -61,3 +61,31 @@ def straight_flush_exists(hand, community):
             if player_card_rank > max_straight_flush:
                 max_straight_flush = player_card_rank
     return max_straight_flush
+
+def determine_best_hand(hand, community):
+    """
+    Given a hand (list of Cards) and the community cards (list of Cards), 
+    determine the best hand using 1 card from the hand + 1 card from community cards
+    
+    Return the type of hand and the value of the hand.
+    Type: 0 = High card, 1 = flush, 2 = straight, 3 = pair, 4 = straight flush
+    Value: the value used to compare 2 hands of the same kind
+    """
+    straight_flush = straight_flush_exists(hand, community)
+    if straight_flush != 0:
+        return 4, straight_flush
+    
+    pair = pair_exists(hand, community)
+    if pair != 0:
+        return 3, pair
+    
+    straight = straight_exists(hand, community)
+    if straight != 0:
+        return 2, straight
+    
+    flush = flush_exists(hand, community)
+    if flush != 0:
+        return 1, flush
+    
+    else:
+        return 0, hand[0].rank()

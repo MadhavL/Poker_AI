@@ -14,6 +14,11 @@ if __name__ == "__main__":
     game_margins = []
     for i in range(num_games):
         winner, margin = game.play(random_agent, random_agent, verbose=False) #Set Verbose to True if you want to see how the game plays out
+        #NOTE: since there is an advantage to being P1, when evaluating 2 agents, we should alternate between which policy is P0 and P1 (equal number)
+        # To simulate the agents swapping positions
+        if i % 2 == 1:
+            winner = -winner
+            margin = -margin
         player_wins.append(winner)
         game_margins.append(margin)
     print(f"Average winner: {np.mean(player_wins)}. Average reward: {np.mean(game_margins)}")

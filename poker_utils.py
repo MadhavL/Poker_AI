@@ -1,4 +1,5 @@
 from collections import defaultdict
+
 def pair_exists(hand, community):
     """
     Given a hand (list of Cards) and the community cards (list of Cards), determine whether a pair exists. 

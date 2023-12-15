@@ -85,7 +85,7 @@ def determine_best_hand(hand, community):
         return 2, straight
     
     flush = flush_exists(hand, community)
-    if flush != 0:
+    if flush:
         return 1, flush
     
     else:

@@ -5,6 +5,9 @@ class Random_Agent:
     def __init__(self):
         pass
 
+    def __str__(self):
+        return f"Random Agent"
+
     #Return the action taken from the state of the game
     def take_action(self, state):
         """

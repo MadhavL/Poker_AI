@@ -7,7 +7,7 @@ import numpy as np
 
 # Simulate the game with your policy agent
 if __name__ == "__main__":
-    num_games = 10000 #How many games to simulate
+    num_games = 25000 #How many games to simulate
     game = PokerGame() #Initialize the game model
 
     always_bet_agent = Always_Bet_Agent()
@@ -15,8 +15,8 @@ if __name__ == "__main__":
     # Agent must have a take_action() function from: state (hand, community card, betting history) -> action in range [0, 1]
 
     #Initialize your agents
-    p0_agent = ExpectimaxAgent(bet_threshold=0.6, verbose=False) #Verbose = True to see how expectimax makes it's decisions
-    p1_agent = ExpectimaxAgent(bet_threshold=0.3, verbose=False)
+    p0_agent = ExpectimaxAgent(bet_threshold=0.9, verbose=False) #Verbose = True to see how expectimax makes it's decisions
+    p1_agent = ExpectimaxAgent(bet_threshold=0.5, verbose=False)
     # p0_agent = Random_Agent()
     # p1_agent = Random_Agent()
     #P0 is the first agent, P1 is the second agent. We will exchange which agent bets first in the simulations
@@ -44,4 +44,4 @@ if __name__ == "__main__":
                 ties += 1
             p0_reward -= margin
     
-    print(f"{num_games} games\nP0 win: {(p0_wins/num_games) * 100:.2f}%. Tie: {(ties/num_games) * 100:.2f}%. P1 win: {((num_games-ties-p0_wins)/num_games) * 100:.2f}%\nP0 avg reward/game: {(p0_reward/num_games):.2f}.")
+    print(f"{p0_agent} vs {p1_agent}\n{num_games} games.\nP0 avg reward/game: {(p0_reward/num_games):.2f}\nP0 win: {(p0_wins/num_games) * 100:.2f}%. Tie: {(ties/num_games) * 100:.2f}%. P1 win: {((num_games-ties-p0_wins)/num_games) * 100:.2f}%")

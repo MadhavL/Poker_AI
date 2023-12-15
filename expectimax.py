@@ -8,6 +8,9 @@ class ExpectimaxAgent():
         self._possible_hands = [lambda x, _: x[0].rank(), poker_utils.flush_exists, poker_utils.straight_exists, poker_utils.pair_exists, poker_utils.straight_flush_exists]
         self._verbose = verbose
         self._bet_threshold = bet_threshold
+
+    def __str__(self):
+        return f"Expectimax Agent (threshold = {self._bet_threshold})"
     
     #Return the action taken from the state of the game
     def take_action(self, state):

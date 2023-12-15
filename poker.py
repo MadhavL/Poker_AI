@@ -12,6 +12,8 @@ class PokerGame:
         self._hands = [[], []] #hands[0] is player 1's hand, hands[1] is player 2's hand. Each hand is a list of Card objects
         self._community_cards = [] # List of Card objects that are the community cards
         self._history = [] #List of actions each player takes (0 or 1), always starts from P0's action.
+        self._blind = 1
+        self._bet = 2
 
     # Reset the game so we can start again
     def reset_game(self):
@@ -53,13 +55,17 @@ class PokerGame:
         assert(self.betting_ended())
 
         # First check cases where hands don't need to be evaluated:
-        #Player 0 checks, 1 bets, 0 folds. P1 wins 1
-        if self._history in [[0, 1, 0], [1, 0], [0, 0]]:
-            return 0, 0
-        
-        #Otherwise, evaluate the better hand (these are only for cases: [0, 1, 1] and [1, 1])
-        reward = 1 #How much is in the pot
+        #Player 0 checks, 1 bets, 0 folds. P1 wins the blind amount
+        if self._history == [0, 1, 0]:
+            return -1, -self._blind
 
+        #Player 0 bets, 1 folds. P0 wins the blind amount
+        elif self._history == [1, 0]:
+            return 1, self._blind
+
+        #Otherwise, evaluate the better hand.
+        #If both players checked, pot = 2 x blind, so reward = blind. If both players bet, pot = 2 x (blind + bet), reward = blind + bet
+        reward = self._blind if self._history == [0, 0] else self._blind + self._bet
         # Note, since a complete hand is only 2 cards in total, and since in Poker only the highest hand plays,
         # then if in any category, both players have the same (non-zero) pair, straight, etc. then it must be a tie 
         # (there is no "kicker")

@@ -128,7 +128,15 @@ class PokerGame:
         elif p1_flush and not p0_flush:
             return -1, -reward
         elif p0_flush and p1_flush:
-            return 1 if p0_flush == max(p0_flush, p1_flush) else -1, 0
+            max_flush = max(p0_flush, p1_flush)
+            if p0_flush == max_flush:
+                if p1_flush == max_flush:
+                    #Tie
+                    return 0, 0
+                else:
+                    return 1, reward
+            else:
+                return -1, -reward
         
         #No pair, straight, or flush. Compare cards
         if verbose:

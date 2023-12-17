@@ -178,7 +178,9 @@ class PokerGame:
         p = 0 #Always start from player 1
 
         while not self.betting_ended():
-            action = policies[p].take_action(self.get_state(p))
+            opp = int(not p)
+
+            action = policies[p].take_action(self.get_state(p), self.get_state(opp)) # added opp's state to call
             if verbose:
                 print(f"Player {p} chooses: {action}")
             self._history.append(action)

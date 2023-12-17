@@ -9,7 +9,7 @@ class Random_Agent:
         return f"Random Agent"
 
     #Return the action taken from the state of the game
-    def take_action(self, state):
+    def take_action(self, state, opp_state):
         """
         return a random action (0 or 1) for this agent
 

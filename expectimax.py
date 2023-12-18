@@ -8,9 +8,10 @@ class ExpectimaxAgent():
         self._possible_hands = [lambda x, _: x[0].rank(), poker_utils.flush_exists, poker_utils.straight_exists, poker_utils.pair_exists, poker_utils.straight_flush_exists]
         self._verbose = verbose
         self._bet_threshold = bet_threshold
+        self._num_bets = 0
 
     def __str__(self):
-        return f"Expectimax Agent (threshold = {self._bet_threshold})"
+        return f"Expectimax Agent (threshold = {self._bet_threshold}). NUM BETS: {self._num_bets}"
     
     #Return the action taken from the state of the game
     def take_action(self, state, opp_state=None):
@@ -64,6 +65,10 @@ class ExpectimaxAgent():
         win_prob = 1 - lose_count / self._remaining_deck.size()
         if self._verbose:
             print(f"Expected win prob: {win_prob: .2f}")
+
+
+        if win_prob > self._bet_threshold:
+            self._num_bets += 1
 
         #Using heuristics for an expectimax agent. If our expected win probability is above our bet threshold, bet. Otherwise fold
         return int(win_prob > self._bet_threshold)

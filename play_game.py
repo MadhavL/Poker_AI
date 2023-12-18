@@ -23,7 +23,7 @@ if __name__ == "__main__":
     # p0_agent = ExpectimaxAgent(bet_threshold=0.9, verbose=False) #Verbose = True to see how expectimax makes it's decisions
     p0_agent = CFR_Agent()
 
-    p1_agent = ExpectimaxAgent(bet_threshold=0.5, verbose=False)
+    p1_agent = ExpectimaxAgent(bet_threshold=0.75, verbose=False)
     # p1_agent = always_bet_agent
     # p1_agent = always_fold_agent
     # p0_agent = Random_Agent()
@@ -61,6 +61,6 @@ if __name__ == "__main__":
     print(f"{p0_agent} vs {p1_agent}")
     print(f"{num_games} games.")
     print(f"P0 avg reward/game: {(p0_reward/num_games):.2f}")
-    print(f"P0 total reward: {p0_reward}")
+    # print(f"P0 total reward: {p0_reward}")
     # print(f"P1 avg reward/game: {p1_reward/num_games:.2f}")
     print(f"P0 win: {(p0_wins/num_games) * 100:.2f}%. Tie: {(ties/num_games) * 100:.2f}%. P1 win: {((num_games-ties-p0_wins)/num_games) * 100:.2f}%")

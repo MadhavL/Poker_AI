@@ -83,7 +83,7 @@ class DQNAgent:
         self.epsilon = self.epsilon_min + (self.epsilon_start - self.epsilon_min) * np.exp(-1 * self.steps / self.epsilon_decay)
 
     
-    def take_action(self, state_tuple):
+    def take_action(self, state_tuple, opp_state):
         # Process the state tuple to get a flat, numeric vector
         state_vector = self.get_state(state_tuple)
         

@@ -3,8 +3,11 @@ class Always_Fold_Agent:
     def __init__(self):
         pass
 
+    def __str__(self):
+        f"Always Fold Agent"
+
     #Return the action taken from the state of the game
-    def take_action(self, state):
+    def take_action(self, state, opp_state):
         """
         return a random action (0 or 1) for this agent
 

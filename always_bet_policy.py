@@ -4,7 +4,7 @@ class Always_Bet_Agent:
         pass
 
     def __str__(self):
-        f"Always Bet Agent"
+        return f"Always Bet Agent"
 
     #Return the action taken from the state of the game
     def take_action(self, state, opp_state):

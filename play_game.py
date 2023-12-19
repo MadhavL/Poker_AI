@@ -6,6 +6,7 @@ from expectimax import ExpectimaxAgent
 from always_bet_policy import Always_Bet_Agent
 from always_fold_policy import Always_Fold_Agent
 from dqn_agent import DQNAgent
+from cfr import CFR_Agent
 import numpy as np
 
 
@@ -14,6 +15,8 @@ def play_matchup(p0_agent, p1_agent):
     p0_wins = 0
     p0_reward = 0
     ties = 0
+
+    # p1_reward = 0
 
     #Simulate game
     for i in range(num_games):
@@ -26,6 +29,7 @@ def play_matchup(p0_agent, p1_agent):
             elif winner == 0:
                 ties += 1
             p0_reward += margin
+            # p1_reward -= margin
         else:
             winner, margin = game.play(p1_agent, p0_agent, verbose=False)
             if winner == -1:
@@ -33,6 +37,7 @@ def play_matchup(p0_agent, p1_agent):
             elif winner == 0:
                 ties += 1
             p0_reward -= margin
+            # p1_reward += margin
     
     print(f"{p0_agent} vs {p1_agent}\n{num_games} games.\nP0 avg reward/game: {(p0_reward/num_games):.2f}\nP0 win: {(p0_wins/num_games) * 100:.2f}%. Tie: {(ties/num_games) * 100:.2f}%. P1 win: {((num_games-ties-p0_wins)/num_games) * 100:.2f}%\n")
 
@@ -54,9 +59,9 @@ if __name__ == "__main__":
     ev_90 = ExpectimaxAgent(bet_threshold=0.9, verbose=False)
 
     dqn = DQNAgent()
-    # TODO: add cfr agent
+    cfr = CFR_Agent()
     
-    agents = [always_bet_agent, always_fold_agent, random, dqn, ev_30, ev_50, ev_70, ev_80, ev_90]
+    agents = [always_bet_agent, always_fold_agent, random, dqn, cfr, ev_30, ev_50, ev_70, ev_80, ev_90]
 
     #P0 is the first agent, P1 is the second agent. We will exchange which agent bets first in the simulations
     
@@ -65,12 +70,6 @@ if __name__ == "__main__":
 
             if p0 != p1:
                 play_matchup(p0, p1)
-
-
-    # run dqn against all other agents    
-
-
-    # TODO: run cfr against all other agents
 
 
 

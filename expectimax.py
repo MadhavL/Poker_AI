@@ -65,5 +65,6 @@ class ExpectimaxAgent():
         if self._verbose:
             print(f"Expected win prob: {win_prob: .2f}")
 
+
         #Using heuristics for an expectimax agent. If our expected win probability is above our bet threshold, bet. Otherwise fold
         return int(win_prob > self._bet_threshold)

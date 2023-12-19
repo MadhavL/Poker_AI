@@ -4,7 +4,7 @@ class Always_Fold_Agent:
         pass
 
     def __str__(self):
-        f"Always Fold Agent"
+        return f"Always Fold Agent"
 
     #Return the action taken from the state of the game
     def take_action(self, state, opp_state):

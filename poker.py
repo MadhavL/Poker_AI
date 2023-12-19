@@ -151,6 +151,36 @@ class PokerGame:
         
         # Tie
         return 0, 0
+    
+    def apply_action(self, player, action):
+        """
+        Apply an action for a given player and return the next state, 
+        immediate reward, and whether the game has ended.
+        """
+        # Append the action to the game history
+        self._history.append(action)
+
+        # Determine if the action ends the betting round
+        betting_done = self.betting_ended()
+
+        # Calculate immediate reward (if applicable)
+        # Note: In poker, immediate rewards are rare except in terminal states
+        # For simplicity, we might assign a small reward for actions or zero
+        immediate_reward = 0
+
+        # Check if the game has ended and calculate the final reward
+        if betting_done:
+            winner, final_reward = self.determine_game_result(verbose=False)
+            if player == winner:
+                immediate_reward += final_reward
+            elif winner != 0:  # If there's a winner and it's not a tie
+                immediate_reward -= final_reward
+            return self.get_state(player), immediate_reward, True
+
+        # If the game is not done, prepare for the next player's action
+        next_player = 1 if player == 0 else 0
+        return self.get_state(next_player), immediate_reward, False
+
 
 
     def play(self, p0_policy, p1_policy, verbose=False):
